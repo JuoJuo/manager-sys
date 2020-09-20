@@ -6,7 +6,7 @@
 
         <Form :model="loginForm" :label-width="80">
           <FormItem label="Username">
-            <Input v-model="loginForm.uname" placeholder="username" size="large">
+            <Input v-model="loginForm.uname" placeholder="username/phone" size="large">
               <Icon type="ios-person-outline" slot="prepend"></Icon>
             </Input>
           </FormItem>
@@ -18,11 +18,16 @@
           </FormItem>
 
           <FormItem>
-            <Row type="flex" justify="center" class="btm">
-              <Col span="24">
+            <Row type="flex" justify="center" class="btm" :gutter="16">
+              <Col span="12">
                 <Button size="large" type="primary"
                         @click="login"
-                        style="width: 100%">Login</Button>
+                        style="width: 100%">Admin Login</Button>
+              </Col>
+              <Col span="12">
+                <Button size="large" type="success"
+                        @click="loginWithWaiter"
+                        style="width: 100%">Waiter Login</Button>
               </Col>
             </Row>
           </FormItem>
@@ -47,9 +52,11 @@ export default {
   },
   methods: {
     login() {
-      api.post('/loginApi', this.loginForm)
-        .then(() => {
+      api.post('/loginManager', this.loginForm)
+        .then(({ data }) => {
           this.$Message.success('login success!');
+          localStorage.clear();
+          localStorage.setItem('admin', JSON.stringify(data));
           this.loginForm = {
             uname: '',
             pwd: '',
@@ -57,7 +64,24 @@ export default {
           this.$router.push({ name: 'index' });
         })
         .catch(({ response }) => {
-          this.$Message.error(response.data.message);
+          this.$Message.error(response.data.msg);
+        });
+    },
+
+    loginWithWaiter() {
+      api.post('/loginWaiter', this.loginForm)
+        .then(({ data }) => {
+          this.$Message.success('login success!');
+          localStorage.clear();
+          localStorage.setItem('waiter', JSON.stringify(data));
+          this.loginForm = {
+            uname: '',
+            pwd: '',
+          };
+          this.$router.push({ name: 'index' });
+        })
+        .catch(({ response }) => {
+          this.$Message.error(response.data.msg);
         });
     },
   },

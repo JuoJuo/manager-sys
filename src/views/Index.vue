@@ -18,7 +18,7 @@
           <BreadcrumbItem>View</BreadcrumbItem>
         </Breadcrumb>
 
-        <Tabs @on-click="tabClick">
+        <Tabs @on-click="tabClick" v-if="!waiter">
           <!--User-->
           <TabPane label="Waiter" icon="md-person">
             <Button type="info" style="margin-left: 10px"
@@ -26,22 +26,23 @@
               Add Waiter
             </Button>
 
-            <Button type="info" style="margin-left: 10px"
+            <Button type="warning" style="margin-left: 10px"
                     :disabled="this.selectedWaiters.length !== 1"
                     @click="openModifyWaiter">
               Modify Waiter
             </Button>
 
-            <Button type="info" style="margin-left: 10px"
+            <Button type="error" style="margin-left: 10px"
                     :disabled="this.selectedWaiters.length !== 1"
                     @click="showDeleteWaiterModal">
               Delete Waiter
             </Button>
-            <Table :columns="uHeaders"
+            <Table :columns="oHeaders"
                    :data="waiterList"
                    @on-selection-change="select"
             ></Table>
           </TabPane>
+
           <!-- Order -->
           <TabPane label="Order" icon="ios-document">
             <Button type="info" style="margin-left: 10px"
@@ -49,7 +50,7 @@
                     @click="changeStatus">
               Change Order Status
             </Button>
-            <Table :columns="tHeaders"
+            <Table :columns="wHeaders"
                    :data="orderList"
                    @on-selection-change="orderSelect"
             ></Table>
@@ -58,23 +59,37 @@
           <!-- Goods -->
           <TabPane label="Goods" icon="ios-document">
             <Button type="info" style="margin-left: 10px"
-                    :disabled="selectedOrders.length !== 1"
-                    @click="changeStatus">
+                    @click="changeGoodsModal">
               Add Goods
             </Button>
 
-            <Button type="info" style="margin-left: 10px"
-                    :disabled="selectedOrders.length !== 1"
-                    @click="changeStatus">
+            <Button type="warning" style="margin-left: 10px"
+                    :disabled="selectedGoods.length !== 1"
+                    @click="modifyGoodsShow">
               Modify Goods
             </Button>
 
+            <Button type="error" style="margin-left: 10px"
+                    :disabled="selectedGoods.length !== 1"
+                    @click="showDeleteGoods = true">
+              Delete Goods
+            </Button>
+            <Table :columns="gHeaders"
+                   :data="goodsList"
+                   @on-selection-change="goodsSelect"
+            ></Table>
+          </TabPane>
+        </Tabs>
+
+        <Tabs @on-click="tabClick" v-else>
+          <!-- Order -->
+          <TabPane label="Order" icon="ios-document">
             <Button type="info" style="margin-left: 10px"
                     :disabled="selectedOrders.length !== 1"
                     @click="changeStatus">
-              Delete Goods
+              Change Order Status
             </Button>
-            <Table :columns="tHeaders"
+            <Table :columns="wHeaders"
                    :data="orderList"
                    @on-selection-change="orderSelect"
             ></Table>
@@ -126,7 +141,7 @@
     <!-- delete Waiter -->
     <Modal
       v-model="showDeleteWaiter"
-      title="Title"
+      title="Notice"
       @on-ok="deleteWaiter">
       <p>Are you sure delete this waiter account?</p>
     </Modal>
@@ -147,6 +162,114 @@
         </FormItem>
       </Form>
     </Modal>
+
+    <!-- Add Goods -->
+    <Modal
+      v-model="goodsModalShow"
+      title="Add Goods"
+      :mask-closable="false"
+      @on-ok="createGoods"
+      @on-cancel="() => goodsModalShow = false">
+      <Form :model="goodsForm" label-position="left" :label-width="160">
+        <FormItem label="Goods Name">
+          <Input v-model="goodsForm.name"></Input>
+        </FormItem>
+        <FormItem label="Description">
+          <Input v-model="goodsForm.desc"></Input>
+        </FormItem>
+        <FormItem label="Price">
+          <Input v-model="goodsForm.price"></Input>
+        </FormItem>
+        <FormItem label="Goods Type">
+          <RadioGroup v-model="goodsForm.type">
+            <Radio label="Single item"></Radio>
+            <Radio label="Meal"></Radio>
+            <Radio label="Snack"></Radio>
+            <Radio label="Drinks"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Goods Image">
+          <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :default-file-list="defaultList"
+                  :on-success="handleSuccess"
+                  :format="['jpg','jpeg','png']"
+                  :max-size="1024"
+                  name="avatar"
+                  :on-format-error="handleFormatError"
+                  :on-exceeded-size="handleMaxSize"
+                  type="drag"
+                  action="/goods/create"
+                  style="display: inline-block;width:58px;">
+            <div style="width: 58px;height:58px;line-height: 58px;">
+              <Icon type="ios-camera" size="20"></Icon>
+            </div>
+          </Upload>
+          <div class="demo-upload-list" v-for="item in defaultList">
+            <img :src="item.url" style="width: 60px; height: 40px">
+          </div>
+        </FormItem>
+      </Form>
+    </Modal>
+
+    <!-- Modify Goods -->
+    <Modal
+      v-model="goodsModalModifyShow"
+      title="Modify Goods"
+      :mask-closable="false"
+      @on-ok="modifyGoods"
+      @on-cancel="() => goodsModalModifyShow = false">
+      <Form :model="goodsForm" label-position="left" :label-width="160">
+        <FormItem label="Goods Name">
+          <Input v-model="goodsForm.name"></Input>
+        </FormItem>
+        <FormItem label="Description">
+          <Input v-model="goodsForm.desc"></Input>
+        </FormItem>
+        <FormItem label="Price">
+          <Input v-model="goodsForm.price"></Input>
+        </FormItem>
+        <FormItem label="Goods Type">
+          <RadioGroup v-model="goodsForm.type">
+            <Radio label="Single item"></Radio>
+            <Radio label="Meal"></Radio>
+            <Radio label="Snack"></Radio>
+            <Radio label="Drinks"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="Goods Image">
+          <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :default-file-list="defaultList"
+                  :on-success="handleSuccess"
+                  :format="['jpg','jpeg','png']"
+                  :max-size="100"
+                  name="avatar"
+                  :on-format-error="handleFormatError"
+                  :on-exceeded-size="handleMaxSize"
+                  type="drag"
+                  action="/goods/create"
+                  style="display: inline-block;width:58px;">
+            <div style="width: 58px;height:58px;line-height: 58px;">
+              <Icon type="ios-camera" size="20"></Icon>
+            </div>
+          </Upload>
+          <div class="demo-upload-list" v-for="item in defaultList">
+            <img :src="item.url" style="width: 60px; height: 40px">
+          </div>
+        </FormItem>
+      </Form>
+    </Modal>
+
+    <!-- delete Goods -->
+    <Modal
+            v-model="showDeleteGoods"
+            title="Notice"
+            @on-ok="deleteGoods">
+      <p>Are you sure delete this goods?</p>
+    </Modal>
   </div>
 </template>
 
@@ -157,7 +280,7 @@ import api from '../api/index';
 export default {
   data() {
     return {
-      uHeaders: [],
+      oHeaders: [],
       waiterList: [],
       showAdd: false,
       waiterForm: {
@@ -176,14 +299,33 @@ export default {
       separate: '--------------------------',
       changeStatusModal: false,
       selectedOrders: [],
-      tHeaders: [],
+      wHeaders: [],
       tData: [],
       orderList: [],
       orderFormSelected: {},
+      separate2: '--------------------------',
+      goodsModalShow: false,
+      gHeaders: [],
+      goodsList: [],
+      selectedGoods: [],
+      goodsForm: {
+        name: '',
+        desc: '',
+        price: '',
+        type: 'Single item',
+        url: '',
+      },
+      defaultList: [],
+      uploadList: [],
+      goodsModalModifyShow: false,
+      showDeleteGoods: false,
+      waiter: null,
     };
   },
   mounted() {
-    this.tHeaders = [
+    this.waiter = localStorage.getItem('waiter');
+
+    this.wHeaders = [
       { type: 'selection', width: 60, align: 'center' },
       { title: 'Order Number', key: '_id' },
       {
@@ -209,7 +351,7 @@ export default {
       },
       { title: 'Status', key: 'status' },
     ];
-    this.uHeaders = [
+    this.oHeaders = [
       { type: 'selection', width: 60, align: 'center' },
       { title: 'Phone', key: 'phone' },
       {
@@ -218,10 +360,47 @@ export default {
       },
       { title: 'Password', key: 'password' },
     ];
+    this.gHeaders = [
+      { type: 'selection', width: 60, align: 'center' },
+      { title: 'Name', key: 'name' },
+      {
+        title: 'Description',
+        key: 'desc',
+      },
+      {
+        title: 'Price',
+        key: 'price',
+      },
+      {
+        title: 'Type',
+        key: 'type',
+      },
+      {
+        title: 'Image',
+        key: 'url',
+        render: (h, { row, column }) => h('img', { style: { width: '60px', height: '40px' }, domProps: { src: row[column.key] } }, ''),
+      },
+    ];
     this.getWaiters();
     this.getOrders();
+    this.getGoods();
   },
   methods: {
+    modifyGoods() {
+      const param = this.goodsForm;
+      api.put('/goods', param)
+        .then(() => {
+          this.getGoods();
+          this.selectedGoods = [];
+        });
+    },
+    modifyGoodsShow() {
+      this.goodsModalModifyShow = true;
+      this.goodsForm = {
+        ...this.selectedGoods[0],
+      };
+      this.defaultList = [{ name: '', url: this.goodsForm.url }];
+    },
     getWaiters() {
       api.get('/waiter')
         .then(({ data }) => {
@@ -231,19 +410,16 @@ export default {
     openAddWaiter() {
       this.showAdd = true;
     },
-    tabClick(key) {
-      if (key === 1) {
-        this.getWaiters();
-      } else if (key === 2) {
-        this.getTasks();
-      }
+    tabClick() {
+      this.getOrders();
+      this.getWaiters();
+      this.getGoods();
     },
     openModifyWaiter() {
       this.waiterFormModify = {
         email: this.selectedWaiters[0].email,
         password: this.selectedWaiters[0].password,
         phone: this.selectedWaiters[0].phone,
-        // eslint-disable-next-line no-underscore-dangle
         _id: this.selectedWaiters[0]._id,
       };
       this.showModifyWaiter = true;
@@ -282,16 +458,22 @@ export default {
     },
     deleteWaiter() {
       const params = {
-        email: this.selectedWaiters[0].email,
-        password: this.selectedWaiters[0].password,
-        phone: this.selectedWaiters[0].phone,
-        // eslint-disable-next-line no-underscore-dangle
         _id: this.selectedWaiters[0]._id,
       };
       api.delete('/waiter', { data: params })
         .then(() => {
           this.getWaiters();
           this.selectedWaiters = [];
+        });
+    },
+    deleteGoods() {
+      const params = {
+        _id: this.selectedGoods[0]._id,
+      };
+      api.delete('/goods', { data: params })
+        .then(() => {
+          this.getGoods();
+          this.selectedGoods = [];
         });
     },
     showDeleteWaiterModal() {
@@ -304,6 +486,9 @@ export default {
     orderSelect(selection) {
       this.selectedOrders = selection;
     },
+    goodsSelect(selection) {
+      this.selectedGoods = selection;
+    },
     getOrders() {
       api.get('/order')
         .then(({ data }) => {
@@ -313,7 +498,6 @@ export default {
     ModifyOrder() {
       const param = {
         status: this.orderFormSelected.status,
-        // eslint-disable-next-line no-underscore-dangle
         _id: this.selectedOrders[0]._id,
       };
       api.put('/order', param)
@@ -325,18 +509,59 @@ export default {
     cancelModifyOrder() {
       this.changeStatusModal = false;
     },
-    logout() {
-      this.setCookie('loginId', '', -1);
-      this.$router.push({ name: 'login' });
+    getGoods() {
+      api.get('/goods')
+        .then(({ data }) => {
+          this.goodsList = data;
+        });
     },
-    setCookie(cname, cvalue, exdays) {
-      const d = new Date();
-      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-      const expires = `expires=${d.toUTCString()}`;
-      document.cookie = `${cname}=${cvalue}; ${expires}`;
+    changeGoodsModal() {
+      this.goodsModalShow = true;
+      this.defaultList = [];
+    },
+    createGoods() {
+      const param = {
+        ...this.goodsForm,
+        url: this.defaultList[0].url,
+      };
+
+      api.post('/goods', param)
+        .then(() => {
+          this.getGoods();
+          this.goodsForm = {
+            name: '',
+            desc: '',
+            price: '',
+            type: 'Single item',
+            url: '',
+          };
+          this.defaultList = [];
+        })
+    },
+    logout() {
+      api.post('logout');
+      this.$router.push({ name: 'login' });
     },
     select(selection) {
       this.selectedWaiters = selection;
+    },
+    handleFormatError (file) {
+      this.$Notice.warning({
+        title: 'The file format is incorrect',
+        desc: 'File format of ' + file.name + ' is incorrect, please select jpg or png.'
+      });
+    },
+    handleMaxSize (file) {
+      this.$Notice.warning({
+        title: 'Exceeding file size limit',
+        desc: 'File  ' + file.name + ' is too large, no more than 100K.'
+      });
+    },
+    handleSuccess (res, file) {
+      file.url = `/${res.data}`;
+      file.name = file.name;
+
+      this.defaultList = [file];
     },
   },
 };
