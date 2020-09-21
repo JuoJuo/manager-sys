@@ -321,12 +321,12 @@ export default {
       {
         title: 'Order Time',
         key: 'orderTime',
-        render: (h, { row, column }) => h('div', {}, moment(new Date(row[column.key])).format('ddd.D.MMM.YYYY')),
+        render: (h, { row, column }) => h('div', {}, moment(new Date(row[column.key])).format('lll')),
       },
       {
         title: 'Pick Uptime',
         key: 'mealTime',
-        render: (h, { row, column }) => h('div', {}, moment(new Date(row[column.key])).format('ddd.D.MMM.YYYY')),
+        render: (h, { row, column }) => h('div', {}, moment(new Date(row[column.key])).format('lll')),
       },
       {
         title: 'Guest phone',
