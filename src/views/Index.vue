@@ -37,7 +37,7 @@
                     @click="showDeleteWaiterModal">
               Delete Waiter
             </Button>
-            <Table :columns="oHeaders"
+            <Table :columns="wHeaders"
                    :data="waiterList"
                    @on-selection-change="select"
             ></Table>
@@ -50,8 +50,10 @@
                     @click="changeStatus">
               Change Order Status
             </Button>
-            <Table :columns="wHeaders"
+            <Table :columns="oHeaders"
                    :data="orderList"
+                   show-summary
+                   :summary-method="handleSummary"
                    @on-selection-change="orderSelect"
             ></Table>
           </TabPane>
@@ -315,8 +317,8 @@ export default {
   mounted() {
     this.waiter = localStorage.getItem('waiter');
 
-    this.wHeaders = [
-      { type: 'selection', width: 60, align: 'center' },
+    this.oHeaders = [
+      { type: 'selection', width: 100, align: 'center' },
       { title: 'Order Number', key: '_id' },
       {
         title: 'Order Time',
@@ -340,9 +342,10 @@ export default {
           row[column.key].map(({ name }) => name).join(',')),
       },
       { title: 'Status', key: 'status' },
+      { title: 'Price', key: 'price' },
     ];
-    this.oHeaders = [
-      { type: 'selection', width: 60, align: 'center' },
+    this.wHeaders = [
+      { type: 'selection', width: 100, align: 'center' },
       { title: 'Phone', key: 'phone' },
       {
         title: 'Email',
@@ -351,7 +354,7 @@ export default {
       { title: 'Password', key: 'password' },
     ];
     this.gHeaders = [
-      { type: 'selection', width: 60, align: 'center' },
+      { type: 'selection', width: 100, align: 'center' },
       { title: 'Name', key: 'name' },
       {
         title: 'Description',
@@ -376,6 +379,41 @@ export default {
     this.getGoods();
   },
   methods: {
+    handleSummary({ columns, data }) {
+      const sums = {};
+      columns.forEach((column, index) => {
+        const key = column.key;
+        if (index === 0) {
+          sums[key] = {
+            key,
+            value: 'Sum'
+          };
+          return;
+        }
+        const values = data.map(item => Number(item[key]));
+        if (!values.every(value => isNaN(value))) {
+          const v = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+          sums[key] = {
+            key,
+            value: `${v}`
+          };
+        } else {
+          sums[key] = {
+            key,
+            value: ''
+          };
+        }
+      });
+
+      return sums;
+    },
     modifyGoods() {
       const param = this.goodsForm;
       api.put('/goods', param)

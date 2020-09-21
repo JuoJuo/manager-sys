@@ -4,6 +4,6 @@ module.exports = {
       warnings: false,
       errors: false,
     },
-    proxy: 'http://localhost:3023',
+    proxy: 'http://localhost:3024',
   },
 };
