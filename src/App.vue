@@ -7,7 +7,6 @@
 <script>
 export default {
   mounted() {
-    // eslint-disable-next-line no-underscore-dangle
     window.__router = this.$router;
   },
 };

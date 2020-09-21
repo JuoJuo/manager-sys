@@ -181,12 +181,7 @@
           <Input v-model="goodsForm.price"></Input>
         </FormItem>
         <FormItem label="Goods Type">
-          <RadioGroup v-model="goodsForm.type">
-            <Radio label="Single item"></Radio>
-            <Radio label="Meal"></Radio>
-            <Radio label="Snack"></Radio>
-            <Radio label="Drinks"></Radio>
-          </RadioGroup>
+          <Input v-model="goodsForm.type"></Input>
         </FormItem>
         <FormItem label="Goods Image">
           <Upload
@@ -231,12 +226,7 @@
           <Input v-model="goodsForm.price"></Input>
         </FormItem>
         <FormItem label="Goods Type">
-          <RadioGroup v-model="goodsForm.type">
-            <Radio label="Single item"></Radio>
-            <Radio label="Meal"></Radio>
-            <Radio label="Snack"></Radio>
-            <Radio label="Drinks"></Radio>
-          </RadioGroup>
+          <Input v-model="goodsForm.type"></Input>
         </FormItem>
         <FormItem label="Goods Image">
           <Upload
@@ -312,7 +302,7 @@ export default {
         name: '',
         desc: '',
         price: '',
-        type: 'Single item',
+        type: '',
         url: '',
       },
       defaultList: [],
@@ -517,6 +507,14 @@ export default {
     },
     changeGoodsModal() {
       this.goodsModalShow = true;
+      this.goodsForm = {
+        name: '',
+        desc: '',
+        price: '',
+        type: '',
+        url: '',
+      };
+
       this.defaultList = [];
     },
     createGoods() {
