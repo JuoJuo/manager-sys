@@ -315,8 +315,9 @@ export default {
     };
   },
   mounted() {
-    debugger
-    this.waiter = JSON.parse(localStorage.getItem('waiter')).data;
+    try {
+      this.waiter = JSON.parse(localStorage.getItem('waiter')).data;
+    } catch (e) {}
 
     this.oHeaders = [
       { type: 'selection', width: 100, align: 'center' },
