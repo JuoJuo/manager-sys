@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     login() {
-      api.post('/loginManager', this.loginForm)
+      api.post('/api/loginManager', this.loginForm)
         .then(({ data }) => {
           this.$Message.success('login success!');
           localStorage.clear();
@@ -69,7 +69,7 @@ export default {
     },
 
     loginWithWaiter() {
-      api.post('/loginWaiter', this.loginForm)
+      api.post('/api/loginWaiter', this.loginForm)
         .then(({ data }) => {
           this.$Message.success('login success!');
           localStorage.clear();

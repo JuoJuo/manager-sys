@@ -197,7 +197,7 @@
                   :on-format-error="handleFormatError"
                   :on-exceeded-size="handleMaxSize"
                   type="drag"
-                  action="/goods/create"
+                  action="/api/goods/create"
                   style="display: inline-block;width:58px;">
             <div style="width: 58px;height:58px;line-height: 58px;">
               <Icon type="ios-camera" size="20"></Icon>
@@ -418,7 +418,7 @@ export default {
     },
     modifyGoods() {
       const param = this.goodsForm;
-      api.put('/goods', param)
+      api.put('/api/goods', param)
         .then(() => {
           this.getGoods();
           this.selectedGoods = [];
@@ -432,7 +432,7 @@ export default {
       this.defaultList = [{ name: '', url: this.goodsForm.url }];
     },
     getWaiters() {
-      api.get('/waiter')
+      api.get('/api/waiter')
         .then(({ data }) => {
           this.waiterList = data;
         });
@@ -462,7 +462,7 @@ export default {
         ...this.waiterForm,
       };
 
-      api.post('/waiter', param)
+      api.post('/api/waiter', param)
         .then(() => {
           this.getWaiters();
           this.waiterForm = {
@@ -480,7 +480,7 @@ export default {
     },
     ModifyWaiter() {
       const param = this.waiterFormModify;
-      api.put('/waiter', param)
+      api.put('/api/waiter', param)
         .then(() => {
           this.getWaiters();
           this.selectedWaiters = [];
@@ -490,7 +490,7 @@ export default {
       const params = {
         _id: this.selectedWaiters[0]._id,
       };
-      api.delete('/waiter', { data: params })
+      api.delete('/api/waiter', { data: params })
         .then(() => {
           this.getWaiters();
           this.selectedWaiters = [];
@@ -500,7 +500,7 @@ export default {
       const params = {
         _id: this.selectedGoods[0]._id,
       };
-      api.delete('/goods', { data: params })
+      api.delete('/api/goods', { data: params })
         .then(() => {
           this.getGoods();
           this.selectedGoods = [];
@@ -520,7 +520,7 @@ export default {
       this.selectedGoods = selection;
     },
     getOrders() {
-      api.get('/order')
+      api.get('/api/order')
         .then(({ data }) => {
           this.orderList = data;
         });
@@ -530,7 +530,7 @@ export default {
         status: this.orderFormSelected.status,
         _id: this.selectedOrders[0]._id,
       };
-      api.put('/order', param)
+      api.put('/api/order', param)
         .then(() => {
           this.getOrders();
           this.selectedOrders = [];
@@ -540,7 +540,7 @@ export default {
       this.changeStatusModal = false;
     },
     getGoods() {
-      api.get('/goods')
+      api.get('/api/goods')
         .then(({ data }) => {
           this.goodsList = data;
         });
@@ -563,7 +563,7 @@ export default {
         url: this.defaultList[0].url,
       };
 
-      api.post('/goods', param)
+      api.post('/api/goods', param)
         .then(() => {
           this.getGoods();
           this.goodsForm = {
@@ -577,7 +577,7 @@ export default {
         })
     },
     logout() {
-      api.post('logout');
+      api.post('/api/logout');
       this.$router.push({ name: 'login' });
     },
     select(selection) {
