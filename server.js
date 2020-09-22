@@ -1,9 +1,11 @@
 const express = require('express');
 const fallback = require('express-history-api-fallback');
 const path = require("path");
+const compression = require('compression');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
+app.use(compression());
 const dir = path.resolve(__dirname, './dist');
 
 const config = {
