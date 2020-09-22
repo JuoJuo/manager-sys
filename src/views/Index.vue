@@ -91,7 +91,7 @@
                     @click="changeStatus">
               Change Order Status
             </Button>
-            <Table :columns="wHeaders"
+            <Table :columns="oHeaders"
                    :data="orderList"
                    @on-selection-change="orderSelect"
             ></Table>
@@ -315,7 +315,8 @@ export default {
     };
   },
   mounted() {
-    this.waiter = localStorage.getItem('waiter');
+    debugger
+    this.waiter = JSON.parse(localStorage.getItem('waiter')).data;
 
     this.oHeaders = [
       { type: 'selection', width: 100, align: 'center' },
