@@ -160,7 +160,12 @@
           {{ orderFormSelected._id }}
         </FormItem>
         <FormItem label="Status">
-          <Input v-model="orderFormSelected.status"></Input>
+          <Select v-model="orderFormSelected.status" style="width:200px">
+            <Option value="Confirming">Confirming</Option>
+            <Option value="Making">Making</Option>
+            <Option value="Canceled">Canceled</Option>
+            <Option value="Completed">Completed</Option>
+          </Select>
         </FormItem>
       </Form>
     </Modal>
