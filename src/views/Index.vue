@@ -349,6 +349,7 @@ export default {
           row[column.key].map(({ name }) => name).join(',')),
       },
       { title: 'Status', key: 'status' },
+      { title: 'Eating Type', key: 'wayOfTakingMeals' },
       { title: 'Price', key: 'price' },
     ];
     this.wHeaders = [
